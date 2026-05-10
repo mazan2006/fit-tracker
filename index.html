@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>FitTrack — Workout Planner</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"/>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="d-flex">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="logo">
+      <div class="logo-text">FitTrack</div>
+      <div class="logo-sub">Workout Planner</div>
+    </div>
+    <div class="nav-section">
+      <div class="nav-label">Menu</div>
+      <button class="nav-item active" onclick="showView('dashboard')"><i class="bi bi-grid-1x2"></i> Dashboard</button>
+      <button class="nav-item" onclick="showView('planner')"><i class="bi bi-calendar3"></i> Planner <span class="today-badge" id="today-count">0</span></button>
+      <button class="nav-item" onclick="showView('workouts')"><i class="bi bi-lightning-charge"></i> Workouts</button>
+      <button class="nav-item" onclick="showView('history')"><i class="bi bi-clock-history"></i> History</button>
+    </div>
+    <div class="sidebar-footer">
+      <div style="font-size:13px;color:var(--text);font-weight:500;" id="user-greeting">Good morning!</div>
+      <div style="margin-top:2px;">Keep pushing forward.</div>
+    </div>
+  </aside>
+
+  <!-- MAIN -->
+  <main class="main">
+    <div class="topbar">
+      <div class="page-title" id="page-title">Dashboard</div>
+      <div class="d-flex gap-2">
+        <button class="btn-ghost" onclick="showView('planner')"><i class="bi bi-plus me-1"></i>Schedule</button>
+        <button class="btn-accent" onclick="openAddWorkout()"><i class="bi bi-plus-lg"></i> New Plan</button>
+      </div>
+    </div>
+
+    <div class="content">
+
+      <!-- DASHBOARD -->
+      <div class="view active" id="view-dashboard">
+        <div class="row g-3 mb-4">
+          <div class="col-6 col-md-3">
+            <div class="stat-card"><div class="stat-label">This Week</div><div class="stat-value" id="stat-week">0</div><div class="stat-sub">workouts done</div></div>
+          </div>
+          <div class="col-6 col-md-3">
+            <div class="stat-card"><div class="stat-label">Total Sessions</div><div class="stat-value" id="stat-total">0</div><div class="stat-sub">all time</div></div>
+          </div>
+          <div class="col-6 col-md-3">
+            <div class="stat-card"><div class="stat-label">Streak</div><div class="stat-value" id="stat-streak">0</div><div class="stat-sub">days in a row</div></div>
+          </div>
+          <div class="col-6 col-md-3">
+            <div class="stat-card"><div class="stat-label">Plans Created</div><div class="stat-value" id="stat-plans">0</div><div class="stat-sub">workout plans</div></div>
+          </div>
+        </div>
+
+        <div class="row g-3 mb-4">
+          <div class="col-md-7">
+            <div class="stat-card">
+              <div class="section-head mb-3">
+                <div class="section-title">Weekly Activity</div>
+                <span class="badge-accent" id="week-label">0 this week</span>
+              </div>
+              <div class="mini-chart" id="week-chart"></div>
+            </div>
+          </div>
+          <div class="col-md-5">
+            <div class="stat-card h-100">
+              <div class="section-title mb-3">Today's Plan</div>
+              <div id="today-plan-preview"><p style="color:var(--muted);font-size:14px;">No workouts scheduled today.</p><button class="btn-accent mt-2" onclick="showView('planner')"><i class="bi bi-plus"></i> Plan Today</button></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="section-head">
+          <div class="section-title">Recent Sessions</div>
+          <button class="btn-ghost" onclick="showView('history')">View all</button>
+        </div>
+        <div id="recent-history"><p style="color:var(--muted);font-size:14px;">No sessions logged yet.</p></div>
+      </div>
+
+      <!-- PLANNER -->
+      <div class="view" id="view-planner">
+        <div class="section-head mb-3">
+          <div class="section-title">Weekly Schedule</div>
+          <button class="btn-accent" onclick="openAddWorkout()"><i class="bi bi-plus-lg"></i> New Plan</button>
+        </div>
+        <div class="cal-strip mb-4" id="cal-strip"></div>
+        <div id="day-workouts"><p style="color:var(--muted);font-size:14px;">Select a day above.</p></div>
+      </div>
+
+      <!-- LIBRARY -->
+      <div class="view" id="view-workouts">
+        <div class="section-head mb-3">
+          <div class="section-title">Workout Library</div>
+          <button class="btn-accent" onclick="openAddWorkout()"><i class="bi bi-plus-lg"></i> New Plan</button>
+        </div>
+        <div class="row g-3" id="workout-library"></div>
+      </div>
+
+      <!-- HISTORY -->
+      <div class="view" id="view-history">
+        <div class="section-head mb-3">
+          <div class="section-title">Session History</div>
+          <span class="badge-accent" id="history-count">0 sessions</span>
+        </div>
+        <div id="history-list"><p style="color:var(--muted);font-size:14px;">No sessions logged yet.</p></div>
+      </div>
+
+    </div>
+  </main>
+</div>
+
+<!-- ADD WORKOUT MODAL -->
+<div class="modal fade" id="workoutModal" tabindex="-1">
+  <div class="modal-dialog modal-lg modal-dialog-scrollable">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Create Workout Plan</h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <div class="row g-3 mb-3">
+          <div class="col-md-6"><label class="form-label">Workout Name</label><input type="text" class="form-control" id="wk-name" placeholder="e.g. Push Day A"/></div>
+          <div class="col-md-3"><label class="form-label">Type</label>
+            <select class="form-select" id="wk-type">
+              <option value="strength">Strength</option>
+              <option value="cardio">Cardio</option>
+              <option value="hiit">HIIT</option>
+              <option value="flexibility">Flexibility</option>
+            </select>
+          </div>
+          <div class="col-md-3"><label class="form-label">Day</label>
+            <select class="form-select" id="wk-day">
+              <option value="0">Monday</option><option value="1">Tuesday</option><option value="2">Wednesday</option>
+              <option value="3">Thursday</option><option value="4">Friday</option><option value="5">Saturday</option><option value="6">Sunday</option>
+            </select>
+          </div>
+          <div class="col-md-4"><label class="form-label">Duration (mins)</label><input type="number" class="form-control" id="wk-duration" value="45" min="5"/></div>
+          <div class="col-md-8"><label class="form-label">Notes (optional)</label><input type="text" class="form-control" id="wk-notes" placeholder="e.g. Focus on progressive overload"/></div>
+        </div>
+        <hr class="divider"/>
+        <div class="section-head mb-2">
+          <div style="font-size:14px;font-weight:500;">Exercises</div>
+          <button class="btn-ghost" style="font-size:12px;padding:5px 12px;" onclick="addExRow()"><i class="bi bi-plus me-1"></i>Add Exercise</button>
+        </div>
+        <div style="background:var(--surface2);border-radius:10px;overflow:hidden;">
+          <table class="exercise-table">
+            <thead><tr><th>Exercise</th><th>Sets</th><th>Reps / Duration</th><th>Rest (s)</th><th></th></tr></thead>
+            <tbody id="exercise-rows"></tbody>
+          </table>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn-ghost" data-bs-dismiss="modal">Cancel</button>
+        <button class="btn-accent" onclick="saveWorkout()"><i class="bi bi-check-lg me-1"></i>Save Plan</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- START WORKOUT MODAL -->
+<div class="modal fade" id="startModal" tabindex="-1">
+  <div class="modal-dialog modal-xl modal-dialog-scrollable">
+    <div class="modal-content">
+      <div class="modal-header">
+        <div><div class="modal-title" id="start-title"></div><div style="font-size:12px;color:var(--muted);" id="start-meta"></div></div>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" onclick="stopTimer()"></button>
+      </div>
+      <div class="modal-body">
+        <div class="active-banner mb-3">
+          <div>
+            <div style="font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-bottom:4px;">Elapsed Time</div>
+            <div class="timer-display" id="timer-display">00:00</div>
+          </div>
+          <div style="text-align:right;">
+            <div style="font-size:11px;color:var(--muted);margin-bottom:6px;" id="progress-label">0 / 0 done</div>
+            <div class="prog-bar-bg" style="width:200px;"><div class="prog-bar-fill" id="progress-bar" style="width:0%"></div></div>
+          </div>
+        </div>
+        <div style="background:var(--surface2);border-radius:10px;overflow:hidden;">
+          <table class="exercise-table" style="width:100%;">
+            <thead><tr><th>Exercise</th><th>Sets</th><th>Reps</th><th>Rest</th><th>Weight (kg)</th><th>Done</th></tr></thead>
+            <tbody id="active-exercise-rows"></tbody>
+          </table>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn-ghost" data-bs-dismiss="modal" onclick="stopTimer()">Cancel</button>
+        <button class="btn-accent" onclick="finishWorkout()"><i class="bi bi-trophy me-1"></i>Complete Workout</button>
+      </div>
+    </div>
+  </div>
+</div>
+<script src="app.js"> </script>
+  
+</body>
+</html>
